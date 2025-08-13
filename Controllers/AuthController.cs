@@ -92,7 +92,7 @@ namespace NoteFlixAPI.Controllers
             //    return BadRequest(new { error = "Geçersiz email veya şifre" });
             //}
 
-            // Şifre kontrolü
+            // Şifre kontrolü.
             //if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             //{
             //    return BadRequest(new { error = "Geçersiz email veya şifre" });
