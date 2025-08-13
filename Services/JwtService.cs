@@ -30,7 +30,7 @@ namespace NoteFlixAPI.Services
                     new Claim(ClaimTypes.Name, user.Name),
                     new Claim("IsPremium", user.IsPremium.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddHours(1), // 1 saat
+                Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["Jwt:Expires"])), // 1 saat
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"]

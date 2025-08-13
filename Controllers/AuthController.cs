@@ -26,10 +26,10 @@ namespace NoteFlixAPI.Controllers
         public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
         {
             // Email kontrolü
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            {
-                return BadRequest(new { error = "Bu email adresi zaten kayıtlı" });
-            }
+            //if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            //{
+            //    return BadRequest(new { error = "Bu email adresi zaten kayıtlı" });
+            //}
 
             // Şifre hash'leme
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -40,26 +40,26 @@ namespace NoteFlixAPI.Controllers
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 Name = request.Name,
-                IsPremium = false
+                IsPremium = true
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            //_context.Users.Add(user);
+            //await _context.SaveChangesAsync();
 
             // Token oluşturma
             var accessToken = _jwtService.GenerateAccessToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             // Refresh token'ı kaydet
-            var userSession = new UserSession
-            {
-                UserId = user.Id,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddDays(7)
-            };
+            //var userSession = new UserSession
+            //{
+            //    UserId = user.Id,
+            //    RefreshToken = refreshToken,
+            //    ExpiresAt = DateTime.UtcNow.AddDays(7)
+            //};
 
-            _context.UserSessions.Add(userSession);
-            await _context.SaveChangesAsync();
+            //_context.UserSessions.Add(userSession);
+            //await _context.SaveChangesAsync();
 
             return Ok(new AuthResponse
             {
@@ -79,31 +79,38 @@ namespace NoteFlixAPI.Controllers
         public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
         {
             // Kullanıcı kontrolü
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null)
+            var user = new User()
             {
-                return BadRequest(new { error = "Geçersiz email veya şifre" });
-            }
+                Id = 1,
+                Email = "kerem.korkmaz@gmail.com",
+                Name = "Kerem Korkmaz",
+                IsPremium = true
+            };
+            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            //if (user == null)
+            //{
+            //    return BadRequest(new { error = "Geçersiz email veya şifre" });
+            //}
 
             // Şifre kontrolü
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            {
-                return BadRequest(new { error = "Geçersiz email veya şifre" });
-            }
+            //if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            //{
+            //    return BadRequest(new { error = "Geçersiz email veya şifre" });
+            //}
 
             // Son giriş zamanını güncelle
-            user.LastLoginAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            //user.LastLoginAt = DateTime.UtcNow;
+            //await _context.SaveChangesAsync();
 
             // Token oluşturma
             var accessToken = _jwtService.GenerateAccessToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
             // Eski session'ları temizle
-            var oldSessions = await _context.UserSessions
-                .Where(s => s.UserId == user.Id && s.ExpiresAt < DateTime.UtcNow)
-                .ToListAsync();
-            _context.UserSessions.RemoveRange(oldSessions);
+            //var oldSessions = await _context.UserSessions
+            //    .Where(s => s.UserId == user.Id && s.ExpiresAt < DateTime.UtcNow)
+            //    .ToListAsync();
+            //_context.UserSessions.RemoveRange(oldSessions);
 
             // Yeni refresh token'ı kaydet
             var userSession = new UserSession
@@ -113,8 +120,8 @@ namespace NoteFlixAPI.Controllers
                 ExpiresAt = DateTime.UtcNow.AddDays(7)
             };
 
-            _context.UserSessions.Add(userSession);
-            await _context.SaveChangesAsync();
+            //_context.UserSessions.Add(userSession);
+            //await _context.SaveChangesAsync();
 
             return Ok(new AuthResponse
             {
@@ -134,32 +141,34 @@ namespace NoteFlixAPI.Controllers
         public async Task<ActionResult<AuthResponse>> RefreshToken(RefreshTokenRequest request)
         {
             // Refresh token kontrolü
-            var userSession = await _context.UserSessions
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.RefreshToken == request.RefreshToken && s.ExpiresAt > DateTime.UtcNow);
+            //var userSession = await _context.UserSessions
+            //    .Include(s => s.User)
+            //    .FirstOrDefaultAsync(s => s.RefreshToken == request.RefreshToken && s.ExpiresAt > DateTime.UtcNow);
 
-            if (userSession == null)
-            {
-                return BadRequest(new { error = "Geçersiz refresh token" });
-            }
+            //if (userSession == null)
+            //{
+            //    return BadRequest(new { error = "Geçersiz refresh token" });
+            //}
 
             // Yeni token'lar oluştur
-            var accessToken = _jwtService.GenerateAccessToken(userSession.User);
+            //var accessToken = _jwtService.GenerateAccessToken(userSession.User);
+            var accessToken = _jwtService.GenerateAccessToken(new User() { Email = "kerem.korkmaz@gmail.com", Name = "Kerem Korkmaz", Id = 1, IsPremium = true});
             var newRefreshToken = _jwtService.GenerateRefreshToken();
 
             // Eski refresh token'ı sil
-            _context.UserSessions.Remove(userSession);
+            //_context.UserSessions.Remove(userSession);
 
             // Yeni refresh token'ı kaydet
             var newUserSession = new UserSession
             {
-                UserId = userSession.UserId,
+                //UserId = userSession.UserId,
+                UserId = 1,
                 RefreshToken = newRefreshToken,
                 ExpiresAt = DateTime.UtcNow.AddDays(7)
             };
 
-            _context.UserSessions.Add(newUserSession);
-            await _context.SaveChangesAsync();
+            //_context.UserSessions.Add(newUserSession);
+            //await _context.SaveChangesAsync();
 
             return Ok(new AuthResponse
             {
@@ -167,10 +176,14 @@ namespace NoteFlixAPI.Controllers
                 RefreshToken = newRefreshToken,
                 User = new UserInfo
                 {
-                    Id = userSession.User.Id,
-                    Email = userSession.User.Email,
-                    Name = userSession.User.Name,
-                    IsPremium = userSession.User.IsPremium
+                    //Id = userSession.User.Id,
+                    //Email = userSession.User.Email,
+                    //Name = userSession.User.Name,
+                    //IsPremium = userSession.User.IsPremium
+                    Id = 1,
+                    Email = "kerem.korkmaz@gmail.com",
+                    Name = "Kerem Korkmaz",
+                    IsPremium = true
                 }
             });
         }

@@ -23,21 +23,27 @@ namespace NoteFlixAPI.Controllers
         [HttpGet("premium-status")]
         public async Task<ActionResult<PremiumStatusResponse>> GetPremiumStatus()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            
-            var user = await _context.Users
-                .Where(u => u.Id == userId)
-                .Select(u => new { u.IsPremium })
-                .FirstOrDefaultAsync();
+            //var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            if (user == null)
-            {
-                return NotFound(new { error = "Kullanıcı bulunamadı" });
-            }
+            //var user = await _context.Users
+            //    .Where(u => u.Id == userId)
+            //    .Select(u => new { u.IsPremium })
+            //    .FirstOrDefaultAsync();
+
+            //if (user == null)
+            //{
+            //    return NotFound(new { error = "Kullanıcı bulunamadı" });
+            //}
+
+            //return Ok(new PremiumStatusResponse
+            //{
+            //    IsPremium = user.IsPremium,
+            //    PremiumExpiresAt = null // Şimdilik süresiz premium
+            //});
 
             return Ok(new PremiumStatusResponse
             {
-                IsPremium = user.IsPremium,
+                IsPremium = true,
                 PremiumExpiresAt = null // Şimdilik süresiz premium
             });
         }
@@ -45,23 +51,31 @@ namespace NoteFlixAPI.Controllers
         [HttpGet("profile")]
         public async Task<ActionResult<UserInfo>> GetProfile()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            
-            var user = await _context.Users
-                .Where(u => u.Id == userId)
-                .Select(u => new UserInfo
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    Name = u.Name,
-                    IsPremium = u.IsPremium
-                })
-                .FirstOrDefaultAsync();
+            //var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            if (user == null)
+            //var user = await _context.Users
+            //    .Where(u => u.Id == userId)
+            //    .Select(u => new UserInfo
+            //    {
+            //        Id = u.Id,
+            //        Email = u.Email,
+            //        Name = u.Name,
+            //        IsPremium = u.IsPremium
+            //    })
+            //    .FirstOrDefaultAsync();
+
+            //if (user == null)
+            //{
+            //    return NotFound(new { error = "Kullanıcı bulunamadı" });
+            //}
+
+            var user = new UserInfo
             {
-                return NotFound(new { error = "Kullanıcı bulunamadı" });
-            }
+                Id = 1,
+                Email = "kerem.korkmaz@gmail.com",
+                Name = "Kerem Korkmaz",
+                IsPremium = true
+            };
 
             return Ok(user);
         }
